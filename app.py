@@ -3398,7 +3398,7 @@ function drawPauseOverlay() {
         "bold 32px Arial";
 
     ctx.fillText(
-        "🐾 PAWSING THE CLAWS 🐾",
+        "🧺 Happy Laundry time...",
         cx,
         cy - 62
     );
@@ -3410,13 +3410,13 @@ function drawPauseOverlay() {
         "bold 20px Arial";
 
     ctx.fillText(
-        "Hunting for letters, dodging T-Rexes...",
+        "Everything is extra cozy, suspiciously funny,",
         cx,
         cy - 12
     );
 
     ctx.fillText(
-        "even legendary cupcake hunters need a breather.",
+        "and the snacks are suddenly incredible. 😌",
         cx,
         cy + 18
     );
