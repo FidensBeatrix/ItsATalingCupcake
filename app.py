@@ -3,171 +3,6 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 # ============================================================
-# SUPABASE CONFIG
-# ============================================================
-def get_supabase_public_config():
-    """
-    Return only the browser-safe Supabase connection values.
-
-    IMPORTANT:
-    - The publishable/anon key is safe to expose to the browser.
-    - A secret/service-role key must NEVER be injected into GAME_HTML.
-    """
-    try:
-        cfg = st.secrets["supabase"]
-        url = str(cfg.get("url", "")).strip()
-
-        public_key = str(
-            cfg.get("publishable_key", "")
-            or cfg.get("anon_key", "")
-        ).strip()
-
-        # Backward-compatible fallback only when `key` is already a
-        # browser-safe publishable/anon key. Never expose sb_secret_*.
-        if not public_key:
-            fallback = str(cfg.get("key", "")).strip()
-            if fallback and not fallback.startswith("sb_secret_"):
-                public_key = fallback
-
-        return url, public_key
-    except Exception:
-        return "", ""
-
-SUPABASE_URL, SUPABASE_PUBLIC_KEY = get_supabase_public_config()
-
-# ============================================================
-# PAGE CONFIG
-# ============================================================
-st.set_page_config(
-    page_title="Testing Game",
-    page_icon="🔵",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-)
-
-# ============================================================
-# LOGIN
-# ============================================================
-def check_credentials(username: str, password: str) -> bool:
-    """
-    Credentials are stored in Streamlit Secrets.
-    Example:
-    [auth.users]
-    Tester1 = "Blue"
-    """
-    try:
-        users = st.secrets["auth"]["users"]
-        return username in users and password == users[username]
-    except Exception:
-        return False
-
-def show_login():
-    st.markdown(
-        """
-        <style>
-        [data-testid="stSidebar"] {
-            display: none;
-        }
-        .block-container {
-            padding-top: 2.2rem;
-            max-width: 920px;
-        }
-        .login-title {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: .15rem;
-        }
-        .login-sub {
-            opacity: .72;
-            margin-bottom: 1rem;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-    left, right = st.columns(
-        [1.35, 1],
-        vertical_alignment="center"
-    )
-    with left:
-        st.markdown(
-            '<div class="login-title">🔵 Testing Game</div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            '<div class="login-sub">'
-            'For the game to begin please sign in'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-        with st.form(
-            "login_form",
-            clear_on_submit=False
-        ):
-            username = st.text_input(
-                "Username",
-                placeholder="Username"
-            )
-            password = st.text_input(
-                "Password",
-                type="password",
-                placeholder="Password"
-            )
-            submitted = st.form_submit_button(
-                "LOGIN",
-                use_container_width=True
-            )
-        if submitted:
-            if check_credentials(username, password):
-                st.session_state["authenticated"] = True
-                st.session_state["username"] = username
-                st.rerun()
-            else:
-                st.error(
-                    "🦖 RAWR... wrong username or password. "
-                    "No castle hunting for impostors."
-                )
-    with right:
-        try:
-            st.image(
-                "RATeamLogo.png",
-                use_container_width=True
-            )
-        except Exception:
-            st.info(
-                "Add **RATeamLogo.png** to the same "
-                "GitHub folder as `app.py`."
-            )
-    st.stop()
-
-if not st.session_state.get(
-    "authenticated",
-    False
-):
-    show_login()
-
-# ============================================================
-# LOGGED-IN HEADER
-# ============================================================
-head_left, head_right = st.columns(
-    [5, 1],
-    vertical_alignment="center"
-)
-with head_left:
-
-    st.caption(
-        f"Logged in as "
-        f"**{st.session_state.get('username', '')}**"
-    )
-
-with head_right:
-    if st.button(
-        "Log out",
-        use_container_width=True
-    ):
-        st.session_state.clear()
-        st.rerun()
-# ============================================================
 # GAME
 # ============================================================
 GAME_HTML = r"""
@@ -886,54 +721,6 @@ GAME_HTML = r"""
 
 <div id="ks-wrap">
 
-<div id="all-player-scoreboard">
-    <div class="all-score-title">🏆 Player scoreboard</div>
-    <table class="all-score-table">
-        <thead>
-            <tr>
-                <th>Player</th>
-                <th>Games</th>
-                <th>Wins</th>
-                <th>Words</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Bubbly</td>
-                <td id="all-Bubbly-games">0</td>
-                <td id="all-Bubbly-wins">0</td>
-                <td id="all-Bubbly-words">0/3</td>
-            </tr>
-            <tr>
-                <td>Tester1</td>
-                <td id="all-Tester1-games">0</td>
-                <td id="all-Tester1-wins">0</td>
-                <td id="all-Tester1-words">0/3</td>
-            </tr>
-            <tr>
-                <td>Tester2</td>
-                <td id="all-Tester2-games">0</td>
-                <td id="all-Tester2-wins">0</td>
-                <td id="all-Tester2-words">0/3</td>
-            </tr>
-            <tr>
-                <td>Tester3</td>
-                <td id="all-Tester3-games">0</td>
-                <td id="all-Tester3-wins">0</td>
-                <td id="all-Tester3-words">0/3</td>
-            </tr>
-            <tr>
-                <td>Tester4</td>
-                <td id="all-Tester4-games">0</td>
-                <td id="all-Tester4-wins">0</td>
-                <td id="all-Tester4-words">0/3</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-</div>
-
 <!-- ======================================================
      INTRO SCREEN
      ====================================================== -->
@@ -941,13 +728,13 @@ GAME_HTML = r"""
 <div id="intro-panel">
 
     <div id="intro-title">
-        🏰 Welcome, Castle Explorer!
+        🧁 Welcome, Muffin Hunter!
     </div>
 
     <div id="intro-text">
 
         Welcome to the ultimate prehistoric spell-off,
-        where you run around collecting castles to snag
+        where you run around collecting muffins to snag
         secret letters and solve a hidden word!
 
         <br><br>
@@ -958,7 +745,7 @@ GAME_HTML = r"""
 
         Except there's a hungry dinosaur hot on your tail,
         fully convinced that
-        &quot;legendary castle explorer&quot;
+        &quot;legendary muffin hunter&quot;
         is the top item on today's lunch menu.
 
     </div>
@@ -980,14 +767,14 @@ GAME_HTML = r"""
         <h3>🎮 How to play</h3>
 
         <p>
-            You are the <strong>green dog</strong>.
+            You are the <strong>family</strong>.
             Your job is to explore the playground while the
             <strong>red dinosaur</strong> chases you.
         </p>
 
         <p>
-            Around the maze you will find <strong> castles</strong>.
-            Walk into a castle to collect it and reveal one hidden character.
+            Around the maze you will find <strong>muffins</strong>.
+            Walk into a muffin to collect it and reveal one hidden character.
         </p>
 
         <p>
@@ -997,7 +784,7 @@ GAME_HTML = r"""
         </p>
 
         <p>
-            After you visit every castle, you will be asked to solve the secret.
+            After you collect every muffin, you will be asked to solve the secret.
             The answer can be a <strong>word</strong>, a <strong>phrase</strong>,
             or a <strong>name</strong>.
         </p>
@@ -1025,7 +812,7 @@ GAME_HTML = r"""
 <div id="ks-header">
 
     <div id="ks-title">
-        🏖️ Game Testing 🏰
+        🏖️ Game Testing 🧁
     </div>
 
     <div id="ks-status">
@@ -1081,7 +868,7 @@ GAME_HTML = r"""
 <div id="guess-panel">
 
     <h3>
-        🦖😢 NOOO! YOU GOT ALL THE CASTLES!
+        🦖😢 NOOO! YOU GOT ALL THE MUFFINS!
     </h3>
 
     <div id="guess-text">
@@ -1163,237 +950,11 @@ if (HAS_TOUCH_UI) {
     ROOT.classList.add("touch-ui");
 }
 
-const CURRENT_USER = __CURRENT_USER_JSON__;
-const SUPABASE_URL = __SUPABASE_URL_JSON__;
-const SUPABASE_PUBLIC_KEY = __SUPABASE_PUBLIC_KEY_JSON__;
-
-const KNOWN_PLAYERS = [
-    "Bubbly",
-    "Tester1",
-    "Tester2",
-    "Tester3",
-    "Tester4"
-];
-
-function emptyStats() {
-    return { games: 0, wins: 0, winningWords: [] };
-}
-
-function normaliseStats(row) {
-    return {
-        games: Number(row?.games || 0),
-        wins: Number(row?.wins || 0),
-        winningWords: Array.isArray(row?.solved_words)
-            ? row.solved_words
-            : []
-    };
-}
-
-let playerStats = emptyStats();
-let allPlayerStats = {};
-let supabaseReady = Boolean(SUPABASE_URL && SUPABASE_PUBLIC_KEY);
-let initialStatsLoaded = false;
-let initialStatsPromise = null;
-
-function supabaseHeaders(extra = {}) {
-    return {
-        // New Supabase publishable keys belong in the apikey header.
-        "apikey": SUPABASE_PUBLIC_KEY,
-        ...extra
-    };
-}
-
-async function fetchAllPlayerStats() {
-    if (!supabaseReady) return {};
-
-    const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/game_stats?select=username,games,wins,solved_words`,
-        {
-            method: "GET",
-            headers: supabaseHeaders({
-                "Accept": "application/json"
-            })
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error(`Supabase read failed: ${response.status}`);
-    }
-
-    const rows = await response.json();
-    const result = {};
-
-    for (const row of rows) {
-        result[row.username] = normaliseStats(row);
-    }
-
-    return result;
-}
-
-async function ensurePlayerStatsLoaded() {
-    if (initialStatsLoaded) return;
-
-    if (!initialStatsPromise) {
-        initialStatsPromise = (async () => {
-            try {
-                const remoteStats = await fetchAllPlayerStats();
-                allPlayerStats = remoteStats;
-
-                if (allPlayerStats[CURRENT_USER]) {
-                    playerStats = {
-                        games: allPlayerStats[CURRENT_USER].games,
-                        wins: allPlayerStats[CURRENT_USER].wins,
-                        winningWords: [
-                            ...allPlayerStats[CURRENT_USER].winningWords
-                        ]
-                    };
-                }
-            } catch (err) {
-                console.error(err);
-            } finally {
-                initialStatsLoaded = true;
-            }
-        })();
-    }
-
-    await initialStatsPromise;
-}
-
-async function updateAllPlayerScoreboard() {
-    try {
-        const remoteStats = await fetchAllPlayerStats();
-
-        if (Object.keys(remoteStats).length) {
-            allPlayerStats = remoteStats;
-        }
-        initialStatsLoaded = true;
-
-        if (allPlayerStats[CURRENT_USER]) {
-            playerStats = {
-                games: allPlayerStats[CURRENT_USER].games,
-                wins: allPlayerStats[CURRENT_USER].wins,
-                winningWords: [...allPlayerStats[CURRENT_USER].winningWords]
-            };
-        }
-    } catch (err) {
-        console.error(err);
-    }
-
-    for (const username of KNOWN_PLAYERS) {
-        const stats = allPlayerStats[username] || emptyStats();
-
-        const gamesEl = document.getElementById(
-            `all-${username}-games`
-        );
-        const winsEl = document.getElementById(
-            `all-${username}-wins`
-        );
-        const wordsEl = document.getElementById(
-            `all-${username}-words`
-        );
-
-        if (gamesEl) gamesEl.textContent = stats.games;
-        if (winsEl) winsEl.textContent = stats.wins;
-        if (wordsEl) {
-            wordsEl.textContent =
-                `${stats.winningWords.length}/${WORD_OPTIONS.length}`;
-        }
-    }
-}
-
-function updateScoreboard() {
-    updateAllPlayerScoreboard();
-}
-
-async function savePlayerStats() {
-    allPlayerStats[CURRENT_USER] = {
-        games: playerStats.games,
-        wins: playerStats.wins,
-        winningWords: [...playerStats.winningWords]
-    };
-
-    // Update the UI immediately, then persist online.
-    for (const username of KNOWN_PLAYERS) {
-        const stats = allPlayerStats[username] || emptyStats();
-        const gamesEl = document.getElementById(`all-${username}-games`);
-        const winsEl = document.getElementById(`all-${username}-wins`);
-        const wordsEl = document.getElementById(`all-${username}-words`);
-
-        if (gamesEl) gamesEl.textContent = stats.games;
-        if (winsEl) winsEl.textContent = stats.wins;
-        if (wordsEl) {
-            wordsEl.textContent =
-                `${stats.winningWords.length}/${WORD_OPTIONS.length}`;
-        }
-    }
-
-    if (!supabaseReady) {
-        console.error("Supabase is not configured.");
-        return;
-    }
-
-    try {
-        const response = await fetch(
-            `${SUPABASE_URL}/rest/v1/game_stats?on_conflict=username`,
-            {
-                method: "POST",
-                headers: supabaseHeaders({
-                    "Content-Type": "application/json",
-                    "Prefer": "resolution=merge-duplicates,return=representation"
-                }),
-                body: JSON.stringify({
-                    username: CURRENT_USER,
-                    games: playerStats.games,
-                    wins: playerStats.wins,
-                    solved_words: playerStats.winningWords
-                })
-            }
-        );
-
-        if (!response.ok) {
-            const details = await response.text();
-            throw new Error(
-                `Supabase save failed: ${response.status} ${details}`
-            );
-        }
-    } catch (err) {
-        console.error(err);
-    }
-}
-
-async function recordGameStart() {
-    // Never overwrite existing online history with zeros if the player
-    // clicks START before the first scoreboard request finishes.
-    await ensurePlayerStatsLoaded();
-    playerStats.games += 1;
-    await savePlayerStats();
-}
-
-async function recordWin() {
-    await ensurePlayerStatsLoaded();
-    playerStats.wins += 1;
-
-    if (!playerStats.winningWords.includes(WORD)) {
-        playerStats.winningWords.push(WORD);
-    }
-
-    await savePlayerStats();
-}
-
 const WORD_OPTIONS = [
     "Testing",
     "Res non verba",
     "P!nk"
 ];
-
-// Load the shared scoreboard from Supabase when the game opens.
-updateScoreboard();
-
-// Keep the scoreboard fresh if another player is playing elsewhere.
-setInterval(
-    updateAllPlayerScoreboard,
-    15000
-);
 
 let WORD = WORD_OPTIONS[0];
 let PLAYABLE_LETTERS = [];
@@ -1510,7 +1071,7 @@ function applyRandomMaze() {
 }
 
 /* ============================================================
-   RANDOM WORD / PHRASE + RANDOM CASTLES
+   RANDOM WORD / PHRASE + RANDOM MUFFINS
    Spaces do NOT need castles.
    Every other character DOES, including punctuation such as !.
    ============================================================ */
@@ -1907,7 +1468,7 @@ function resetGame(
             0,
 
         lastEvent:
-            "Find all letters in the castles!"
+            "Find all letters in the muffins!"
 
     };
 
@@ -2111,7 +1672,7 @@ function checkCastle() {
         250;
 
     state.lastEvent =
-        `🏰 Castle opened — letter: ${letter}`;
+        `🧁 Muffin collected — letter: ${letter}`;
 
     if (
         state.castles.size === 0
@@ -2127,7 +1688,7 @@ function checkCastle() {
             true;
 
         state.lastEvent =
-            "🦖😢 NOOO! You got all the castles...";
+            "🦖😢 NOOO! You got all the muffins...";
 
         /*
         Show the guess panel almost immediately.
@@ -2701,7 +2262,7 @@ function startOpeningCountdown() {
                     false;
 
                 state.lastEvent =
-                    "Visit all castles!";
+                    "Collect all muffins!";
 
                 render();
 
@@ -2972,7 +2533,7 @@ function submitGuess() {
         state.score += 1000;
         state.lastEvent = `🎉 CORRECT! ${WORD}!`;
 
-        recordWin();
+        
 
         guessPanel.style.display = "none";
         render();
@@ -3108,7 +2669,7 @@ function updateLabels() {
     const found = total - state.castles.size;
 
     statusEl.textContent =
-        `Castles ${found}/${total}` +
+        `Muffins ${found}/${total}` +
         `   •   Score ${state.score}` +
         `   •   ${state.lastEvent}`;
 
@@ -3277,87 +2838,50 @@ function drawPortal(
 }
 
 /* ============================================================
-   DRAW CASTLE
+   DRAW MUFFIN
    ============================================================ */
 
 function drawCastle(pos) {
 
-    const [
-        r,
-        c
-    ] =
-        pos;
+    const [r, c] = pos;
+    const cx = c * CELL + CELL / 2;
+    const cy = r * CELL + CELL / 2;
 
-    const cx =
-        c * CELL +
-        CELL / 2;
-
-    const cy =
-        r * CELL +
-        CELL / 2;
-
+    /* MUFFIN WRAPPER */
     ctx.beginPath();
-
-    ctx.arc(
-        cx,
-        cy,
-        14,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fillStyle =
-        "#fde68a";
-
+    ctx.moveTo(cx - 9, cy + 1);
+    ctx.lineTo(cx + 9, cy + 1);
+    ctx.lineTo(cx + 7, cy + 12);
+    ctx.lineTo(cx - 7, cy + 12);
+    ctx.closePath();
+    ctx.fillStyle = "#f59e0b";
     ctx.fill();
-
-    ctx.strokeStyle =
-        "#f59e0b";
-
-    ctx.lineWidth =
-        2;
-
+    ctx.strokeStyle = "#92400e";
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    drawRect(
-        cx - 10,
-        cy - 3,
-        20,
-        12,
-        "#d6a24b",
-        "#7c4a16"
-    );
+    /* MUFFIN TOP */
+    ctx.beginPath();
+    ctx.arc(cx, cy - 2, 11, Math.PI, 0);
+    ctx.arc(cx + 6, cy - 1, 6, Math.PI * 1.5, Math.PI * 0.5);
+    ctx.arc(cx - 6, cy - 1, 6, Math.PI * 0.5, Math.PI * 1.5);
+    ctx.closePath();
+    ctx.fillStyle = "#fbbf24";
+    ctx.fill();
+    ctx.strokeStyle = "#92400e";
+    ctx.stroke();
 
-    drawRect(
-        cx - 11,
-        cy - 10,
-        7,
-        8,
-        "#d6a24b",
-        "#7c4a16"
-    );
-
-    drawRect(
-        cx + 4,
-        cy - 10,
-        7,
-        8,
-        "#d6a24b",
-        "#7c4a16"
-    );
-
-    drawRect(
-        cx - 3,
-        cy + 3,
-        6,
-        6,
-        "#7c4a16"
-    );
-
+    /* CHOCOLATE CHIPS */
+    ctx.fillStyle = "#78350f";
+    for (const [dx, dy] of [[-5,-5],[3,-7],[6,-1],[-2,0]]) {
+        ctx.beginPath();
+        ctx.arc(cx + dx, cy + dy, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }
 
 /* ============================================================
-   DRAW PLAYER - RED DOG
+   DRAW PLAYER - FAMILY
    ============================================================ */
 
 function drawPlayer() {
@@ -3366,126 +2890,27 @@ function drawPlayer() {
     const cx = c * CELL + CELL / 2;
     const cy = r * CELL + CELL / 2;
 
-    /* LEFT EAR */
+    /* FAMILY: two adults + child */
+    const people = [
+        {x: cx - 8, y: cy - 5, head: 5, body: "#2563eb"},
+        {x: cx + 8, y: cy - 5, head: 5, body: "#db2777"},
+        {x: cx,     y: cy + 3, head: 4, body: "#16a34a"}
+    ];
 
-    ctx.beginPath();
+    for (const p of people) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y - 4, p.head, 0, Math.PI * 2);
+        ctx.fillStyle = "#f5cfa0";
+        ctx.fill();
+        ctx.strokeStyle = "#fff7ed";
+        ctx.lineWidth = 1;
+        ctx.stroke();
 
-    ctx.ellipse(
-        cx - 11,
-        cy - 2,
-        6,
-        10,
-        -.25,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fillStyle =
-        "#15803d";
-
-    ctx.fill();
-
-    /* RIGHT EAR */
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        cx + 11,
-        cy - 2,
-        6,
-        10,
-        .25,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-    /* HEAD */
-
-    ctx.beginPath();
-
-    ctx.arc(
-        cx,
-        cy,
-        13,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fillStyle =
-        "#22c55e";
-
-    ctx.fill();
-
-    ctx.strokeStyle =
-        "#bbf7d0";
-
-    ctx.lineWidth =
-        2;
-
-    ctx.stroke();
-
-    /* MUZZLE */
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        cx,
-        cy + 5,
-        8,
-        6,
-        0,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fillStyle =
-        "#dcfce7";
-
-    ctx.fill();
-
-    /* EYES */
-
-    ctx.beginPath();
-
-    ctx.arc(
-        cx - 5,
-        cy - 4,
-        2,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.arc(
-        cx + 5,
-        cy - 4,
-        2,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fillStyle =
-        "#111827";
-
-    ctx.fill();
-
-    /* NOSE */
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        cx,
-        cy + 2,
-        3,
-        2.5,
-        0,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
+        ctx.beginPath();
+        ctx.roundRect(p.x - 5, p.y + 1, 10, 9, 3);
+        ctx.fillStyle = p.body;
+        ctx.fill();
+    }
 }
 
 /* ============================================================
@@ -3703,7 +3128,7 @@ function drawPauseOverlay() {
     );
 
     ctx.fillText(
-        "even legendary castle explorers need a breather.",
+        "even legendary muffin hunters need a breather.",
         cx,
         cy + 18
     );
@@ -3734,7 +3159,7 @@ function drawGuessOverlay() {
     ctx.fillStyle = "#ffd166";
     ctx.font = "bold 31px Arial";
     ctx.fillText(
-        "🦖😢 NOOO! YOU GOT ALL THE CASTLES!",
+        "🦖😢 NOOO! YOU GOT ALL THE MUFFINS!",
         cx,
         cy - 42
     );
@@ -4639,7 +4064,7 @@ document
         "click",
         () => {
 
-            recordGameStart();
+            
 
             resetGame(
                 true
@@ -4718,7 +4143,7 @@ startGameButton.addEventListener(
         gameArea.style.display =
             "block";
 
-        recordGameStart();
+        
 
         resetGame(
             true
@@ -4793,27 +4218,8 @@ resetGame(
 # DISPLAY GAME
 # ============================================================
 
-CURRENT_USER_JSON = json.dumps(
-    st.session_state.get("username", "Player")
-)
-SUPABASE_URL_JSON = json.dumps(SUPABASE_URL)
-SUPABASE_PUBLIC_KEY_JSON = json.dumps(SUPABASE_PUBLIC_KEY)
-
-if not SUPABASE_URL or not SUPABASE_PUBLIC_KEY:
-    st.warning(
-        "Supabase scoreboard is not connected yet. Add `url` and "
-        "`publishable_key` under `[supabase]` in Streamlit Secrets."
-    )
-
-GAME_HTML_FOR_USER = (
-    GAME_HTML
-    .replace("__CURRENT_USER_JSON__", CURRENT_USER_JSON)
-    .replace("__SUPABASE_URL_JSON__", SUPABASE_URL_JSON)
-    .replace("__SUPABASE_PUBLIC_KEY_JSON__", SUPABASE_PUBLIC_KEY_JSON)
-)
-
 components.html(
-    GAME_HTML_FOR_USER,
+    GAME_HTML,
     height=825,
     scrolling=True
 )
