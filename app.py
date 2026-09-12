@@ -647,8 +647,8 @@ GAME_HTML = r"""
    ========================= */
 #mobile-controls {
     display: none;
-    margin: 10px auto 4px;
-    width: 210px;
+    margin: 12px auto 6px;
+    width: 246px;
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
@@ -656,9 +656,9 @@ GAME_HTML = r"""
 
 .mobile-pad {
     display: grid;
-    grid-template-columns: 64px 64px 64px;
-    grid-template-rows: 58px 58px 58px;
-    gap: 6px;
+    grid-template-columns: 74px 74px 74px;
+    grid-template-rows: 66px 66px 66px;
+    gap: 8px;
     justify-content: center;
 }
 
@@ -667,7 +667,7 @@ GAME_HTML = r"""
     border-radius: 14px;
     background: #7c3aed;
     color: white;
-    font-size: 27px;
+    font-size: 31px;
     font-weight: 900;
     line-height: 1;
     box-shadow: 0 4px 0 #4c1d95;
@@ -725,6 +725,28 @@ GAME_HTML = r"""
 }
 
 @media (max-width: 700px) {
+
+    #word-progress {
+        width: 98%;
+        gap: 8px 12px;
+        margin-bottom: 8px;
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    #unique-mode-note {
+        font-size: 10px;
+    }
+
+    #mobile-controls {
+        display: block !important;
+        width: 246px;
+    }
+
+    .mobile-move {
+        min-height: 66px;
+        min-width: 74px;
+    }
 
     #ks-wrap {
         width: 100%;
@@ -829,17 +851,6 @@ GAME_HTML = r"""
 </style>
 
 <div id="ks-wrap">
-
-<div id="word-progress">
-    <span>Possible words: <span class="word-progress-number" id="possible-word-count">0</span></span>
-    <span>Found: <span class="word-progress-number" id="found-word-count">0</span></span>
-    <button id="unique-mode-button" type="button">
-        New words only: ON
-    </button>
-    <div id="unique-mode-note">
-        ON = already solved words are skipped when a new round is randomized.
-    </div>
-</div>
 
 <!-- ======================================================
      INTRO SCREEN
@@ -958,6 +969,17 @@ GAME_HTML = r"""
     style="display:none;"
 >
 
+<div id="word-progress">
+    <span>Possible words: <span class="word-progress-number" id="possible-word-count">0</span></span>
+    <span>Found: <span class="word-progress-number" id="found-word-count">0</span></span>
+    <button id="unique-mode-button" type="button">
+        New words only: ON
+    </button>
+    <div id="unique-mode-note">
+        ON = already solved words are skipped when a new round is randomized.
+    </div>
+</div>
+
 <div id="ks-header">
 
     <div id="ks-title">
@@ -1002,7 +1024,7 @@ GAME_HTML = r"""
         <button class="mobile-move" id="move-down" aria-label="Move down">▼</button>
         <button class="mobile-move" id="move-right" aria-label="Move right">▶</button>
     </div>
-    <div id="mobile-hint">Tap the arrows or swipe directly on the playground</div>
+    <div id="mobile-hint">Tap the arrows or swipe directly on the playground 👆</div>
 </div>
 
 <div id="help">
@@ -4233,7 +4255,7 @@ Object.entries(touchDirections).forEach(([id, direction]) => {
 let swipeStartX = null;
 let swipeStartY = null;
 let swipeHandled = false;
-const SWIPE_MIN = 18;
+const SWIPE_MIN = 10;
 
 function applySwipeFromPoint(clientX, clientY) {
     if (swipeStartX === null || swipeStartY === null || swipeHandled) return;
