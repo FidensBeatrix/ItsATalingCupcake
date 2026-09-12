@@ -3,6 +3,16 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 # ============================================================
+# PAGE CONFIG
+# ============================================================
+st.set_page_config(
+    page_title="Pontiac Family Rescue",
+    page_icon="🧁",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
+
+# ============================================================
 # GAME
 # ============================================================
 GAME_HTML = r"""
@@ -18,7 +28,7 @@ GAME_HTML = r"""
         sans-serif;
 }
 #ks-wrap {
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -76,12 +86,14 @@ GAME_HTML = r"""
    INTRO
    ========================= */
 #intro-panel {
-    max-width: 820px;
+    width: min(1120px, 96%);
+    max-width: 1120px;
+    box-sizing: border-box;
     margin:
-        28px auto
-        18px auto;
+        8px auto
+        8px auto;
     padding:
-        30px 34px;
+        20px 30px;
     border:
         2px solid
         #7c3aed;
@@ -92,25 +104,26 @@ GAME_HTML = r"""
     text-align:
         center;
     line-height:
-        1.65;
+        1.38;
     font-size:
-        17px;
+        16px;
 }
 #intro-title {
     color:
         #ffd166;
     font-size:
-        27px;
+        30px;
     font-weight:
         900;
     margin-bottom:
-        18px;
+        12px;
 }
 #intro-text {
     color:
         #f8fafc;
     font-size:
-        17px;
+        16px;
+    line-height: 1.4;
 }
 
 #start-game {
@@ -147,7 +160,7 @@ GAME_HTML = r"""
 }
 
 #intro-buttons {
-    margin-top: 22px;
+    margin-top: 14px;
     display: flex;
     justify-content: center;
     gap: 10px;
@@ -635,8 +648,9 @@ GAME_HTML = r"""
     }
 
     #intro-panel {
-        margin: 10px auto;
-        padding: 18px 14px;
+        width: 98%;
+        margin: 6px auto;
+        padding: 14px 12px;
         font-size: 15px;
     }
 
@@ -735,45 +749,45 @@ GAME_HTML = r"""
 
         The Pontiac family is having a perfectly normal family day...
 
-        <br><br>
+        <br>
 
         Except for one tiny problem.
 
-        <br><br>
+        <br>
 
         🦖 <strong>A DINOSAUR IS CHASING THEM.</strong>
 
-        <br><br>
+        <br>
 
         And apparently, <strong>you’re the only person qualified to deal with this situation.</strong>
 
-        <br><br>
+        <br>
 
         Your mission is simple: guide the Pontiac family through the playground, collect every 🧁 <strong>cupcake</strong>, and reveal the hidden letters along the way.
 
-        <br><br>
+        <br>
 
         The letters will be completely scrambled — because obviously the dinosaur couldn't make this easy.
 
-        <br><br>
+        <br>
 
         Collect them all, solve the <strong>anagram</strong>, and figure out the secret word or phrase to save the Pontiac family!
 
-        <br><br>
+        <br>
 
         Sounds easy, right?
 
-        <br><br>
+        <br>
 
         <strong>Cupcakes = good. 🧁<br>
         Dinosaur = bad. 🦖<br>
         Pontiac family becoming dinosaur lunch = VERY bad.</strong>
 
-        <br><br>
+        <br>
 
         Good luck, Marcell.
 
-        <br><br>
+        <br>
 
         <strong>The Pontiac family is counting on you. 👨‍👩‍👧</strong>
 
