@@ -2618,7 +2618,7 @@ function pauseGame() {
             [0, 0];
 
         state.lastEvent =
-            "🧺 Happy Laundry time... everything is extra cozy, suspiciously funny, and the snacks are suddenly incredible. 😌";
+            "🧺 Happy Laundry time 😌";
 
         render();
 
@@ -4382,7 +4382,7 @@ helpGameLiveButton.addEventListener(
             state.paused = true;
             state.playerDir = [0, 0];
             state.nextDir = [0, 0];
-            state.lastEvent = "🧺 Happy Laundry time... everything is extra cozy, suspiciously funny, and the snacks are suddenly incredible. 😌";
+            state.lastEvent = "🧺 Happy Laundry time 😌";
             render();
         }
 
