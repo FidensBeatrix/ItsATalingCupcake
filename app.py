@@ -1140,10 +1140,10 @@ const WORD_OPTIONS = [
 const WORD_HINTS = {
     "MOP": "Three letters. Think cleaning floors — or maybe a person.",
     "Pontiac": "Think of a place where you met John.",
-    "Ex wife": "Two words. A relationship status where the romance is very much in the past.",
+    "Ex-wife": "Two words. A relationship status where the romance is very much in the past.",
     "West Coast Swing": "A dance style: smooth, slotted, and definitely not from the East Coast.",
     "Jungle Book": "A classic story with a jungle, a boy, and some extremely opinionated animals.",
-    "Marci around the big world": Think back - in one part of it, you were amazed by how quickly they managed to asphalt a road.",
+    "Marci around the big world": "Think back — in one part of it, you were amazed by how quickly they managed to asphalt a road.",
     "Share": "Five letters. What you do when one cupcake should become everybody's problem.",
     "404 Joke Not Found": "A web error went looking for a punchline... but apparently the page is missing.",
     "Pi Never Ends": "A math constant whose decimal expansion has absolutely no idea when to stop."
