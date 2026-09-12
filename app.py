@@ -370,6 +370,13 @@ GAME_HTML = r"""
         auto;
 }
 
+
+#game {
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
 /* =========================
    BUTTONS
    ========================= */
@@ -1017,19 +1024,9 @@ GAME_HTML = r"""
 
 </div>
 
-<div id="mobile-controls" aria-label="Mobile movement controls">
-    <div class="mobile-pad">
-        <button class="mobile-move" id="move-up" aria-label="Move up">▲</button>
-        <button class="mobile-move" id="move-left" aria-label="Move left">◀</button>
-        <button class="mobile-move" id="move-down" aria-label="Move down">▼</button>
-        <button class="mobile-move" id="move-right" aria-label="Move right">▶</button>
-    </div>
-    <div id="mobile-hint">Tap the arrows or swipe directly on the playground 👆</div>
-</div>
-
 <div id="help">
 
-    Move with Arrow Keys / WASD / touch controls
+    Move with Arrow Keys / WASD / swipe on the playground
     • SPACE pauses
     • Purple portal = IN
     • Blue portal = OUT
@@ -1346,6 +1343,19 @@ function updateWordProgress() {
             "OFF = any word can appear again, including ones you already solved.";
     }
 }
+
+
+function markCurrentWordFound() {
+    const before = foundWords.size;
+    foundWords.add(WORD);
+
+    if (foundWords.size > before) {
+        saveFoundWords();
+    }
+
+    updateWordProgress();
+}
+
 
 function chooseRandomWord() {
     let choices = [...WORD_OPTIONS];
@@ -2821,6 +2831,7 @@ function submitGuess() {
         state.awaitingGuess = false;
         state.gameOver = true;
         state.won = true;
+        markCurrentWordFound();
         state.score += 1000;
         state.lastEvent = `🎉 CORRECT! ${WORD}!`;
 
