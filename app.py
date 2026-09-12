@@ -585,6 +585,63 @@ GAME_HTML = r"""
 }
 
 
+
+/* =========================
+   WORD PROGRESS / RANDOMIZER MODE
+   ========================= */
+
+#word-progress {
+    width: min(760px, 96%);
+    margin: 4px auto 12px auto;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    border: 1px solid #3f6212;
+    border-radius: 10px;
+    background: #111827;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    font-weight: 800;
+    color: #f8fafc;
+}
+
+.word-progress-number {
+    color: #ffd166;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+#unique-mode-button {
+    border: 0;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 900;
+    color: white;
+    background: #3f6212;
+    cursor: pointer;
+}
+
+#unique-mode-button:hover {
+    background: #4d7c0f;
+}
+
+#unique-mode-button.off {
+    background: #475569;
+}
+
+#unique-mode-note {
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    opacity: .72;
+    margin-top: -5px;
+}
+
 /* =========================
    MOBILE TOUCH CONTROLS
    ========================= */
@@ -773,6 +830,17 @@ GAME_HTML = r"""
 
 <div id="ks-wrap">
 
+<div id="word-progress">
+    <span>Possible words: <span class="word-progress-number" id="possible-word-count">0</span></span>
+    <span>Found: <span class="word-progress-number" id="found-word-count">0</span></span>
+    <button id="unique-mode-button" type="button">
+        New words only: ON
+    </button>
+    <div id="unique-mode-note">
+        ON = already solved words are skipped when a new round is randomized.
+    </div>
+</div>
+
 <!-- ======================================================
      INTRO SCREEN
      ====================================================== -->
@@ -801,7 +869,7 @@ GAME_HTML = r"""
 
         <br>
 
-        Your mission is simple: guide the Pontiac family through the playground, collect every <strong>cupcake</strong>, and reveal the hidden letters along the way.
+        Your mission is simple: guide the Pontiac family through the playground, collect every 🧁 <strong>cupcake</strong>, and reveal the hidden letters along the way.
 
         <br>
 
@@ -1062,9 +1130,37 @@ const WORD_HINTS = {
     "Pi Never Ends": "A math constant whose decimal expansion has absolutely no idea when to stop."
 };
 
+
+const FOUND_WORDS_STORAGE_KEY = "talkingCupcakeFoundWords";
+const UNIQUE_MODE_STORAGE_KEY = "talkingCupcakeNewWordsOnly";
+
+function loadFoundWords() {
+    try {
+        const raw = localStorage.getItem(FOUND_WORDS_STORAGE_KEY);
+        const saved = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(saved)) return new Set();
+        return new Set(saved.filter(word => WORD_OPTIONS.includes(word)));
+    } catch (err) {
+        return new Set();
+    }
+}
+
+function loadUniqueMode() {
+    try {
+        const raw = localStorage.getItem(UNIQUE_MODE_STORAGE_KEY);
+        return raw === null ? true : raw === "true";
+    } catch (err) {
+        return true;
+    }
+}
+
+let foundWords = loadFoundWords();
+let newWordsOnly = loadUniqueMode();
+
 let WORD = WORD_OPTIONS[0];
 let PLAYABLE_LETTERS = [];
 let previousWord = null;
+
 
 const CELL = 30;
 const SPEED = 135;
@@ -1182,17 +1278,76 @@ function applyRandomMaze() {
    Every other character DOES, including punctuation such as !.
    ============================================================ */
 
-function chooseRandomWord() {
-    let choices = WORD_OPTIONS;
 
-    if (previousWord !== null && WORD_OPTIONS.length > 1) {
-        choices = WORD_OPTIONS.filter(word => word !== previousWord);
+const possibleWordCountEl = document.getElementById("possible-word-count");
+const foundWordCountEl = document.getElementById("found-word-count");
+const uniqueModeButton = document.getElementById("unique-mode-button");
+const uniqueModeNote = document.getElementById("unique-mode-note");
+
+function saveFoundWords() {
+    try {
+        localStorage.setItem(
+            FOUND_WORDS_STORAGE_KEY,
+            JSON.stringify([...foundWords])
+        );
+    } catch (err) {}
+}
+
+function saveUniqueMode() {
+    try {
+        localStorage.setItem(
+            UNIQUE_MODE_STORAGE_KEY,
+            String(newWordsOnly)
+        );
+    } catch (err) {}
+}
+
+function updateWordProgress() {
+    possibleWordCountEl.textContent = WORD_OPTIONS.length;
+    foundWordCountEl.textContent = foundWords.size;
+
+    uniqueModeButton.textContent =
+        `New words only: ${newWordsOnly ? "ON" : "OFF"}`;
+
+    uniqueModeButton.classList.toggle("off", !newWordsOnly);
+
+    if (newWordsOnly) {
+        if (foundWords.size >= WORD_OPTIONS.length) {
+            uniqueModeNote.textContent =
+                "You found them all 🎉 Randomizer can now use the full list again.";
+        } else {
+            uniqueModeNote.textContent =
+                "ON = already solved words are skipped when a new round is randomized.";
+        }
+    } else {
+        uniqueModeNote.textContent =
+            "OFF = any word can appear again, including ones you already solved.";
+    }
+}
+
+function chooseRandomWord() {
+    let choices = [...WORD_OPTIONS];
+
+    if (newWordsOnly) {
+        const unseen = WORD_OPTIONS.filter(word => !foundWords.has(word));
+
+        if (unseen.length > 0) {
+            choices = unseen;
+        }
+    }
+
+    if (previousWord !== null && choices.length > 1) {
+        const withoutPrevious = choices.filter(word => word !== previousWord);
+        if (withoutPrevious.length > 0) {
+            choices = withoutPrevious;
+        }
     }
 
     WORD = choices[Math.floor(Math.random() * choices.length)];
     previousWord = WORD;
     PLAYABLE_LETTERS = [...WORD].filter(ch => ch !== " ");
 }
+
 
 function allPortalKeys() {
     const keys = new Set();
@@ -4262,6 +4417,14 @@ document
         "click",
         pauseGame
     );
+
+uniqueModeButton.addEventListener("click", () => {
+    newWordsOnly = !newWordsOnly;
+    saveUniqueMode();
+    updateWordProgress();
+});
+
+updateWordProgress();
 
 hintButton.addEventListener("click", () => {
     const isOpen = hintText.style.display === "block";
