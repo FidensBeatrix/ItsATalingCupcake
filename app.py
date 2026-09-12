@@ -126,6 +126,12 @@ GAME_HTML = r"""
     line-height: 1.4;
 }
 
+#intro-text > br {
+    display: block;
+    content: "";
+    margin-top: 7px;
+}
+
 #start-game {
     margin-top:
         22px;
