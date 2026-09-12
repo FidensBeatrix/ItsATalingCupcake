@@ -728,25 +728,54 @@ GAME_HTML = r"""
 <div id="intro-panel">
 
     <div id="intro-title">
-        🧁 Welcome, Muffin Hunter!
+        🧁 Welcome, Marcell!
     </div>
 
     <div id="intro-text">
 
-        Welcome to the ultimate prehistoric spell-off,
-        where you run around collecting muffins to snag
-        secret letters and solve a hidden word!
+        The Pontiac family is having a perfectly normal family day...
 
         <br><br>
 
-        Sounds simple, right?
+        Except for one tiny problem.
 
         <br><br>
 
-        Except there's a hungry dinosaur hot on your tail,
-        fully convinced that
-        &quot;legendary muffin hunter&quot;
-        is the top item on today's lunch menu.
+        🦖 <strong>A DINOSAUR IS CHASING THEM.</strong>
+
+        <br><br>
+
+        And apparently, <strong>you’re the only person qualified to deal with this situation.</strong>
+
+        <br><br>
+
+        Your mission is simple: guide the Pontiac family through the playground, collect every 🧁 <strong>cupcake</strong>, and reveal the hidden letters along the way.
+
+        <br><br>
+
+        The letters will be completely scrambled — because obviously the dinosaur couldn't make this easy.
+
+        <br><br>
+
+        Collect them all, solve the <strong>anagram</strong>, and figure out the secret word or phrase to save the Pontiac family!
+
+        <br><br>
+
+        Sounds easy, right?
+
+        <br><br>
+
+        <strong>Cupcakes = good. 🧁<br>
+        Dinosaur = bad. 🦖<br>
+        Pontiac family becoming dinosaur lunch = VERY bad.</strong>
+
+        <br><br>
+
+        Good luck, Marcell.
+
+        <br><br>
+
+        <strong>The Pontiac family is counting on you. 👨‍👩‍👧</strong>
 
     </div>
 
