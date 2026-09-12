@@ -6,7 +6,7 @@ import streamlit.components.v1 as components
 # PAGE CONFIG
 # ============================================================
 st.set_page_config(
-    page_title="Pontiac Family Rescue",
+    page_title="Talking Cupcake",
     page_icon="🧁",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -208,13 +208,15 @@ GAME_HTML = r"""
 }
 
 #help-card {
-    width: min(620px, 92vw);
+    width: min(1120px, 96vw);
+    max-width: 1120px;
+    box-sizing: border-box;
     background: #111827;
     border: 2px solid #7c3aed;
     border-radius: 14px;
-    padding: 24px 26px;
+    padding: 22px 30px;
     color: #f8fafc;
-    text-align: left;
+    text-align: center;
     box-shadow: 0 18px 50px rgba(0,0,0,.35);
 }
 
@@ -226,8 +228,8 @@ GAME_HTML = r"""
 }
 
 #help-card p {
-    margin: 9px 0;
-    line-height: 1.55;
+    margin: 7px 0;
+    line-height: 1.45;
     font-size: 15px;
 }
 
@@ -540,6 +542,36 @@ GAME_HTML = r"""
         pointer;
 }
 
+#hint-wrap {
+    margin-top: 10px;
+}
+
+#hint-button {
+    border: 1px solid #ffd166;
+    border-radius: 7px;
+    padding: 7px 12px;
+    background: transparent;
+    color: #ffd166;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+#hint-button:hover {
+    background: rgba(255, 209, 102, 0.10);
+}
+
+#hint-text {
+    display: none;
+    max-width: 520px;
+    margin: 8px auto 0;
+    padding: 9px 12px;
+    border-radius: 7px;
+    background: #0b1220;
+    color: #fde68a;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
 #guess-feedback {
 
     min-height:
@@ -769,7 +801,7 @@ GAME_HTML = r"""
 
         <br>
 
-        Your mission is simple: guide the Pontiac family through the playground, collect every 🧁 <strong>cupcake</strong>, and reveal the hidden letters along the way.
+        Your mission is simple: guide the Pontiac family through the playground, collect every <strong>cupcake</strong>, and reveal the hidden letters along the way.
 
         <br>
 
@@ -822,8 +854,8 @@ GAME_HTML = r"""
         </p>
 
         <p>
-            Around the maze you will find <strong>muffins</strong>.
-            Walk into a muffin to collect it and reveal one hidden character.
+            Around the maze you will find <strong>cupcakes</strong>.
+            Walk into a cupcake to collect it and reveal one hidden character.
         </p>
 
         <p>
@@ -833,7 +865,7 @@ GAME_HTML = r"""
         </p>
 
         <p>
-            After you collect every muffin, you will be asked to solve the secret.
+            After you collect every cupcake, you will be asked to solve the secret.
             The answer can be a <strong>word</strong>, a <strong>phrase</strong>,
             or a <strong>name</strong>.
         </p>
@@ -861,7 +893,7 @@ GAME_HTML = r"""
 <div id="ks-header">
 
     <div id="ks-title">
-        🏖️ Game Testing 🧁
+        🧁 Talking Cupcake 🧁
     </div>
 
     <div id="ks-status">
@@ -954,6 +986,13 @@ GAME_HTML = r"""
         GUESS
     </button>
 
+    <div id="hint-wrap">
+        <button id="hint-button" title="Hover here for a tiny clue — click to keep it open">
+            💡 Need a hint?
+        </button>
+        <div id="hint-text"></div>
+    </div>
+
     <div id="guess-feedback">
     </div>
 
@@ -1000,10 +1039,28 @@ if (HAS_TOUCH_UI) {
 }
 
 const WORD_OPTIONS = [
-    "Testing",
-    "Res non verba",
-    "P!nk"
+    "MOP",
+    "Pontiac",
+    "Ex wife",
+    "West Coast Swing",
+    "Jungle Book",
+    "Marci around the big world",
+    "Share",
+    "404 Joke Not Found",
+    "Pi Never Ends"
 ];
+
+const WORD_HINTS = {
+    "MOP": "Three letters. Think cleaning floors — or maybe a suspiciously important abbreviation.",
+    "Pontiac": "Think wheels, engines, and an old-school American car badge.",
+    "Ex wife": "Two words. A relationship status where the romance is very much in the past.",
+    "West Coast Swing": "A dance style: smooth, slotted, and definitely not from the East Coast.",
+    "Jungle Book": "A classic story with a jungle, a boy, and some extremely opinionated animals.",
+    "Marci around the big world": "A title-like phrase involving Marci and a very ambitious travel itinerary.",
+    "Share": "Five letters. What you do when one cupcake should become everybody's problem.",
+    "404 Joke Not Found": "A web error went looking for a punchline... but apparently the page is missing.",
+    "Pi Never Ends": "A math constant whose decimal expansion has absolutely no idea when to stop."
+};
 
 let WORD = WORD_OPTIONS[0];
 let PLAYABLE_LETTERS = [];
@@ -1282,6 +1339,16 @@ const guessRule =
         "guess-rule"
     );
 
+const hintButton =
+    document.getElementById(
+        "hint-button"
+    );
+
+const hintText =
+    document.getElementById(
+        "hint-text"
+    );
+
 const introPanel =
     document.getElementById(
         "intro-panel"
@@ -1517,7 +1584,7 @@ function resetGame(
             0,
 
         lastEvent:
-            "Find all letters in the muffins!"
+            "Find all letters in the cupcakes!"
 
     };
 
@@ -1526,6 +1593,11 @@ function resetGame(
 
     guessFeedback.textContent =
         "";
+
+    hintText.textContent = WORD_HINTS[WORD] || "No hint for this one. Marcell is on his own 😈";
+    hintText.style.display = "none";
+    hintButton.textContent = "💡 Need a hint?";
+    hintButton.title = WORD_HINTS[WORD] || "Click for a hint";
 
     guessInput.value =
         "";
@@ -1737,7 +1809,7 @@ function checkCastle() {
             true;
 
         state.lastEvent =
-            "🦖😢 NOOO! You got all the muffins...";
+            "🦖😢 NOOO! You got all the cupcakes...";
 
         /*
         Show the guess panel almost immediately.
@@ -2265,7 +2337,7 @@ function startOpeningCountdown() {
                         "GO!";
 
                     state.lastEvent =
-                        "GO! 🐶💨";
+                        "GO! 🧁";
 
                     render();
 
@@ -2311,7 +2383,7 @@ function startOpeningCountdown() {
                     false;
 
                 state.lastEvent =
-                    "Collect all muffins!";
+                    "Collect all cupcakes!";
 
                 render();
 
@@ -2424,7 +2496,7 @@ function startCountdown() {
                         false;
 
                     state.lastEvent =
-                        "GO! 🐶💨";
+                        "GO! 🧁";
 
                     render();
 
@@ -2555,14 +2627,7 @@ function answerMatches(rawGuess) {
     const guess = normalizedSpacing(rawGuess);
     const answer = normalizedSpacing(WORD);
 
-    // P!nk is deliberately case-sensitive:
-    // correct = P!nk
-    // wrong   = p!nk, P!NK, etc.
-    if (WORD === "P!nk") {
-        return guess === answer;
-    }
-
-    // The other words/phrases are case-insensitive.
+    // All words and phrases are case-insensitive.
     return guess.toLocaleLowerCase() === answer.toLocaleLowerCase();
 }
 
@@ -2606,15 +2671,8 @@ function submitGuess() {
     const guessedPlayable = playableOnly(rawGuess);
     const collectedPlayable = playableOnly(collected);
 
-    const comparableGuess =
-        WORD === "P!nk"
-            ? guessedPlayable
-            : guessedPlayable.toLocaleLowerCase();
-
-    const comparableCollected =
-        WORD === "P!nk"
-            ? collectedPlayable
-            : collectedPlayable.toLocaleLowerCase();
+    const comparableGuess = guessedPlayable.toLocaleLowerCase();
+    const comparableCollected = collectedPlayable.toLocaleLowerCase();
 
     if (!sameCounts(comparableGuess, comparableCollected)) {
         guessFeedback.textContent =
@@ -2622,13 +2680,6 @@ function submitGuess() {
             `Use only the ${PLAYABLE_LETTERS.length} characters you actually found: ` +
             state.collected.join(" ");
 
-        guessFeedback.style.color = "#fbbf24";
-    } else if (
-        WORD === "P!nk" &&
-        normalizedSpacing(rawGuess) !== "P!nk"
-    ) {
-        guessFeedback.textContent =
-            "Almost! For this one capitalization matters: P is uppercase, n and k are lowercase — and don't forget !";
         guessFeedback.style.color = "#fbbf24";
     } else {
         guessFeedback.textContent =
@@ -2718,7 +2769,7 @@ function updateLabels() {
     const found = total - state.castles.size;
 
     statusEl.textContent =
-        `Muffins ${found}/${total}` +
+        `Cupcakes ${found}/${total}` +
         `   •   Score ${state.score}` +
         `   •   ${state.lastEvent}`;
 
@@ -2887,7 +2938,7 @@ function drawPortal(
 }
 
 /* ============================================================
-   DRAW MUFFIN
+   DRAW CUPCAKE
    ============================================================ */
 
 function drawCastle(pos) {
@@ -3177,7 +3228,7 @@ function drawPauseOverlay() {
     );
 
     ctx.fillText(
-        "even legendary muffin hunters need a breather.",
+        "even legendary cupcake hunters need a breather.",
         cx,
         cy + 18
     );
@@ -3380,7 +3431,7 @@ function render() {
 
                     "#111827",
 
-                    "#2563eb",
+                    "#2f855a",
 
                     2
 
@@ -4211,6 +4262,18 @@ document
         "click",
         pauseGame
     );
+
+hintButton.addEventListener("click", () => {
+    const isOpen = hintText.style.display === "block";
+    hintText.style.display = isOpen ? "none" : "block";
+    hintButton.textContent = isOpen ? "💡 Need a hint?" : "💡 Hide hint";
+});
+
+hintButton.addEventListener("mouseenter", () => {
+    if (hintText.style.display !== "block") {
+        hintButton.title = WORD_HINTS[WORD] || "Click for a hint";
+    }
+});
 
 guessButton.addEventListener(
     "click",
