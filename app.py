@@ -3515,7 +3515,7 @@ function drawEndOverlay() {
 
             780,
 
-            220,
+            state.won ? 220 : 330,
 
             state.won
 
@@ -3585,7 +3585,42 @@ function drawEndOverlay() {
         ctx.fillText(
             "You were delicious! 😋",
             cx,
-            cy + 18
+            cy + 10
+        );
+
+        // Clickable-looking restart button drawn directly in the death overlay.
+        drawRect(
+            cx - 150,
+            cy + 48,
+            300,
+            58,
+            "#7c3aed",
+            "#a78bfa",
+            3
+        );
+
+        ctx.fillStyle =
+            "white";
+
+        ctx.font =
+            "bold 23px Arial";
+
+        ctx.fillText(
+            "START NEW GAME",
+            cx,
+            cy + 84
+        );
+
+        ctx.fillStyle =
+            "#93c5fd";
+
+        ctx.font =
+            "bold 17px Arial";
+
+        ctx.fillText(
+            "or press ENTER",
+            cx,
+            cy + 135
         );
 
     }
@@ -3728,9 +3763,13 @@ function render() {
 
     /* CHARACTERS */
 
+    // The dinosaur stays visible after a loss.
+    // The family disappears once the dinosaur catches them.
     drawDino();
 
-    drawPlayer();
+    if (!(state.gameOver && !state.won)) {
+        drawPlayer();
+    }
 
     /* OVERLAYS */
 
@@ -4125,6 +4164,17 @@ function keyHandler(e) {
     const key =
         e.key.toLowerCase();
 
+    // After the dinosaur catches the family, ENTER immediately starts a new game.
+    if (
+        state.gameOver &&
+        !state.won &&
+        key === "enter"
+    ) {
+        e.preventDefault();
+        resetGame(true);
+        return;
+    }
+
     /* SPACE = PAUSE */
 
     if (
@@ -4513,7 +4563,31 @@ guessButton.addEventListener(
 
 canvas.addEventListener(
     "click",
-    () => {
+    (event) => {
+
+        // The death-screen restart button is drawn on the canvas, so convert
+        // the displayed click position back to the canvas's internal pixels.
+        if (state.gameOver && !state.won) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (event.clientX - rect.left) * scaleX;
+            const y = (event.clientY - rect.top) * scaleY;
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+
+            if (
+                x >= cx - 150 &&
+                x <= cx + 150 &&
+                y >= cy + 48 &&
+                y <= cy + 106
+            ) {
+                resetGame(true);
+                ROOT.focus();
+                return;
+            }
+        }
 
         ROOT.focus();
 
