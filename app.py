@@ -4164,10 +4164,9 @@ function keyHandler(e) {
     const key =
         e.key.toLowerCase();
 
-    // After the dinosaur catches the family, ENTER immediately starts a new game.
+    // After either a win or a loss, ENTER immediately starts a new game.
     if (
         state.gameOver &&
-        !state.won &&
         key === "enter"
     ) {
         e.preventDefault();
