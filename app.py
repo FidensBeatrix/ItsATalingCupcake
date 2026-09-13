@@ -640,6 +640,21 @@ GAME_HTML = r"""
     background: #475569;
 }
 
+#reset-found-button {
+    border: 0;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 900;
+    color: white;
+    background: #7c2d12;
+    cursor: pointer;
+}
+
+#reset-found-button:hover {
+    background: #9a3412;
+}
+
 #unique-mode-note {
     width: 100%;
     text-align: center;
@@ -982,6 +997,9 @@ GAME_HTML = r"""
     <button id="unique-mode-button" type="button">
         New words only: ON
     </button>
+    <button id="reset-found-button" type="button">
+        Reset Found
+    </button>
     <div id="unique-mode-note">
         ON = already solved words are skipped when a new round is randomized.
     </div>
@@ -1301,6 +1319,7 @@ function applyRandomMaze() {
 const possibleWordCountEl = document.getElementById("possible-word-count");
 const foundWordCountEl = document.getElementById("found-word-count");
 const uniqueModeButton = document.getElementById("unique-mode-button");
+const resetFoundButton = document.getElementById("reset-found-button");
 const uniqueModeNote = document.getElementById("unique-mode-note");
 
 function saveFoundWords() {
@@ -1320,6 +1339,19 @@ function saveUniqueMode() {
         );
     } catch (err) {}
 }
+
+resetFoundButton.addEventListener("click", () => {
+    const ok = window.confirm("Reset all found words back to 0?");
+    if (!ok) return;
+
+    foundWords.clear();
+
+    try {
+        localStorage.removeItem(FOUND_WORDS_STORAGE_KEY);
+    } catch (err) {}
+
+    updateWordProgress();
+});
 
 function updateWordProgress() {
     possibleWordCountEl.textContent = WORD_OPTIONS.length;
